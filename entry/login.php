@@ -30,6 +30,7 @@ include "../db.php";
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['email'] = $row['email'];
                 $_SESSION['fullname'] = $row['fullname'];
+                $_SESSION['id'] = $row['id'];
                 ?>
                 <script>
                     alert("Login successful");

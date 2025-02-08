@@ -1,15 +1,17 @@
 <?php
 include "../header.php";
 include "../db.php";
-$username = $_SESSION['username'];
-$fetch_id = "SELECT id FROM users WHERE username = ?";
-$stmt = $conn->prepare($fetch_id);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-$user_row = $result->fetch_assoc();
-$user_id = $user_row['id'];
-$stmt->close();
+if (isset($_SESSION['username'])) {
+    $username = $_SESSION['username'];
+    $fetch_id = "SELECT id FROM users WHERE username = ?";
+    $stmt = $conn->prepare($fetch_id);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user_row = $result->fetch_assoc();
+    $user_id = $user_row['id'];
+    $stmt->close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -38,11 +40,20 @@ $stmt->close();
             }
         }
     </script>
+    <style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
 </head>
-<body class="text-white">
-    <div class="container mx-auto p-4">
-        <h1 class="text-3xl font-bold mb-6 text-center">Dashboard</h1>
-        <button onclick="toggleForm()" class="bg-[#0A7075] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded mb-4">Create Poll</button>
+<body class="relative text-white">
+    <div class="container mx-auto p-4 fixed text-white">
+        <h1 class="text-6xl font-bold mb-6 text-center mt-6">Dashboard</h1>
+        <button onclick="toggleForm()" class="bg-[#FF007F] hover:bg-[#8A2BEE] text-white font-bold py-2 px-4 rounded mb-4">Create Poll</button>
         <div id="createPollForm" style="display: none;" class="bg-[#032F30] p-4 rounded-lg mb-4 shadow-lg max-w-md mx-auto">
             <form action="addpoll.php" method="POST">
                 <div class="mb-4">
@@ -62,64 +73,48 @@ $stmt->close();
             </form>
         </div>
         <?php
-        $disp_poll = "SELECT polls.*, users.username FROM polls JOIN users ON polls.created_by = users.id";
-        $result = mysqli_query($conn, $disp_poll);
+        $disp_poll = "SELECT polls.*, users.username 
+                      FROM polls 
+                      JOIN users ON polls.created_by = users.id 
+                      WHERE polls.id NOT IN (SELECT poll_id FROM votes WHERE user_id = ?) 
+                      ORDER BY polls.created_at ASC";
+        $stmt = $conn->prepare($disp_poll);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
         if ($result) {
+            echo"<div class='w-full flex gap-4 overflow-x-auto scrollbar-hide pb-4'>";
             while ($row = mysqli_fetch_assoc($result)) {
-                echo "<div class='bg-[#032F30] p-4 rounded-lg mb-4 shadow-lg'>";
-                echo "<strong>Topic:</strong> " . htmlspecialchars($row['topic']) . "<br>";
-                echo "<strong>Created by:</strong> " . htmlspecialchars($row['username']) . "<br>";
-                echo "<strong>Created at:</strong> " . htmlspecialchars($row['created_at']) . "<br>";
+                echo "<div class='bg-black/40 p-4 rounded-lg mb-4 shadow-lg min-w-[400px]'>";
+                echo "<h1 class='text-2xl font-bold text-center'>" . htmlspecialchars($row['topic']) . "</h1><br>";
+                echo "<div class='flex justify-around color-gray text-xs'> <h1><strong>Posted by: </strong>" . htmlspecialchars($row['username']) . "</h1>";
+                echo "<h1><strong>At:</strong> " . htmlspecialchars($row['created_at']) . "</h1> </div> <br>";
                 $poll_id = $row['id'];
-                $check_vote = "SELECT option_id FROM votes WHERE poll_id = ? AND user_id = ?";
-                $vote_stmt = $conn->prepare($check_vote);
-                $vote_stmt->bind_param("ii", $poll_id, $user_id);
-                $vote_stmt->execute();
-                $vote_result = $vote_stmt->get_result();
-                if ($vote_result->num_rows > 0) {
-                    $vote_row = $vote_result->fetch_assoc();
-                    $voted_option_id = $vote_row['option_id'];
-                    $disp_options = "SELECT * FROM poll_options WHERE poll_id = ?";
-                    $opt_stmt = $conn->prepare($disp_options);
-                    $opt_stmt->bind_param("i", $poll_id);
-                    $opt_stmt->execute();
-                    $opt_result = $opt_stmt->get_result();
-                    if ($opt_result) {
-                        while ($opt_row = $opt_result->fetch_assoc()) {
-                            if ($opt_row['id'] == $voted_option_id) {
-                                echo "<strong>" . htmlspecialchars($opt_row['option_text']) . " (Your vote)</strong><br>";
-                            } else {
-                                echo htmlspecialchars($opt_row['option_text']) . "<br>";
-                            }
-                        }
+                $disp_options = "SELECT * FROM poll_options WHERE poll_id = ?";
+                $opt_stmt = $conn->prepare($disp_options);
+                $opt_stmt->bind_param("i", $poll_id);
+                $opt_stmt->execute();
+                $opt_result = $opt_stmt->get_result();
+                if ($opt_result) {
+                    echo "<form action='vote.php' method='POST' class='mt-4'>";
+                    while ($opt_row = $opt_result->fetch_assoc()) {
+                        echo "<label class='block'>";
+                        echo "<input type='radio' name='vote' value='" . $opt_row['id'] . "' class='mr-2'>";
+                        echo htmlspecialchars($opt_row['option_text']);
+                        echo "</label>";
                     }
-                    $opt_stmt->close();
-                } else {
-                    $disp_options = "SELECT * FROM poll_options WHERE poll_id = ?";
-                    $opt_stmt = $conn->prepare($disp_options);
-                    $opt_stmt->bind_param("i", $poll_id);
-                    $opt_stmt->execute();
-                    $opt_result = $opt_stmt->get_result();
-                    if ($opt_result) {
-                        echo "<form action='vote.php' method='POST' class='mt-4'>";
-                        while ($opt_row = $opt_result->fetch_assoc()) {
-                            echo "<label class='block'>";
-                            echo "<input type='radio' name='vote' value='" . $opt_row['id'] . "' class='mr-2'>";
-                            echo htmlspecialchars($opt_row['option_text']);
-                            echo "</label>";
-                        }
-                        echo "<input type='hidden' name='poll_id' value='" . $poll_id . "'>";
-                        echo "<button type='submit' name='submit' class='mt-2 bg-[#0A7075] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded'>Vote</button>";
-                        echo "</form>";
-                    }
-                    $opt_stmt->close();
+                    echo "<input type='hidden' name='poll_id' value='" . $poll_id . "'>";
+                    echo "<button type='submit' name='submit' class='mt-2 bg-[#0A7075] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded'>Vote</button>";
+                    echo "</form>";
                 }
-                $vote_stmt->close();
+                $opt_stmt->close();
                 echo "</div>";
             }
+            echo"</div>";
         } else {
             echo "<p>No polls available</p>";
         }
+        $stmt->close();
         ?>
     </div>
 </body>

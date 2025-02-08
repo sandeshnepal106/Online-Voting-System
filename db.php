@@ -14,8 +14,8 @@ if ($conn->connect_error) {
 }
 else {
     ?>
-    <script>
+    <!-- <script>
         alert("Connection successful");
-    </script>
+    </script> -->
     <?php
 }

@@ -45,9 +45,9 @@ if (isset($_POST['submit'])) {
     <title>Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#274D60] text-white">
-    <div class="flex items-center justify-center min-h-screen">
-        <div class="bg-[#032F30] p-8 rounded-lg shadow-lg w-full max-w-md">
+<body class="relative text-white">
+    <div class="fixed flex items-center justify-center min-h-screen">
+        <div class="bg-black/40 p-8 rounded-lg shadow-lg w-full max-w-md">
             <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
             <form action="" method="POST">
                 <div class="mb-4">

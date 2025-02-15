@@ -46,22 +46,22 @@ if (isset($_POST['submit'])) {
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="relative text-white">
-    <div class="fixed flex items-center justify-center min-h-screen">
+    <div class="sticky top-0 flex items-center justify-center min-h-screen text-white">
         <div class="bg-black/40 p-8 rounded-lg shadow-lg w-full max-w-md">
             <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
             <form action="" method="POST">
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium">Email</label>
-                    <input type="email" name="email" id="email" class="w-full p-2 mt-1 rounded bg-[#031716] text-white" required>
+                    <input type="email" name="email" id="email" class="w-full p-2 mt-1 rounded bg-[#8A2BE2] text-white" required>
                 </div>
                 <div class="mb-6">
                     <label for="password" class="block text-sm font-medium">Password</label>
-                    <input type="password" name="password" id="password" class="w-full p-2 mt-1 rounded bg-[#031716] text-white" required>
+                    <input type="password" name="password" id="password" class="w-full p-2 mt-1 rounded bg-[#8A2BE2] text-white" required>
                 </div>
-                <button type="submit" name="submit" class="w-full bg-[#0A7075] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded">Login</button>
+                <button type="submit" name="submit" class="w-full bg-[#FF007F] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded">Login</button>
             </form>
             <div class="mt-4 text-center">
-                <a href="register.php" class="text-[var(--color-muted)] hover:underline">Not a user yet? Register here</a>
+                <a href="register.php" class="hover:underline">Not a user yet? Register here</a>
             </div>
         </div>
     </div>

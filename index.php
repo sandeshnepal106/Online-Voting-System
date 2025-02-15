@@ -46,9 +46,9 @@ include "db.php";
             </div>
         <?php else: ?>
             <div class="sticky top-0 p-4 rounded-lg shadow-lg mb-4 text-[#F0F0F0]">
-            <h1 class="text-4xl font-bold mb-6 text-center">Dashboard</h1>
+            <h1 class="text-4xl font-bold mb-6 text-center text-[#FF007F]">Dashboard</h1>
             <div class="mb-8">
-                <h2 class="text-2xl font-bold mb-4">Available Polls</h2>
+                <h2 class="text-2xl font-bold mb-4 text-[#FF007F]">Available Polls</h2>
                 <div class="w-full flex gap-4 overflow-x-auto scrollbar-hide pb-4">
                     <?php
                     $user_id = $_SESSION['id'];
@@ -88,7 +88,8 @@ include "db.php";
                             $opt_stmt->close();
                             echo "</div>";
                         }
-                    } else {
+                    } 
+                    else {
                         echo "<p>No polls available</p>";
                     }
                     $stmt->close();
@@ -96,16 +97,16 @@ include "db.php";
                 </div>
             </div>
             <div>
-                <h2 class="text-2xl font-bold mb-4">Results</h2>
-                <div class="w-full flex gap-4 overflow-x-auto scrollbar-hide pb-4">
+                <h2 class="text-2xl font-bold mb-4 text-[#FF007F]">Results</h2>
                     <?php
                     $disp_poll = "SELECT polls.*, users.username FROM polls JOIN users ON polls.created_by = users.id";
                     $stmt = $conn->prepare($disp_poll);
                     $stmt->execute();
                     $result = $stmt->get_result();
                     if ($result) {
+                        echo "<div class='w-full flex gap-4 overflow-x-auto scrollbar-hide pb-4'>";
                         while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<div class='bg-black/40 p-4 rounded-lg mb-4 shadow-lg min-w-[300px]'>";
+                            echo "<div class='bg-black/40 p-4 rounded-lg mb-4 shadow-lg min-w-[400px]'>";
                             echo "<h1 class='text-2xl font-bold text-center'>" . htmlspecialchars($row['topic']) . "</h1><br>";
                             echo "<div class='flex justify-around text-xs'> <h1><strong>Posted by: </strong>" . htmlspecialchars($row['username']) . "</h1>";
                             echo "<h1><strong>At:</strong> " . htmlspecialchars($row['created_at']) . "</h1> </div> <br>";
@@ -130,10 +131,12 @@ include "db.php";
                                     }
                                     $vote_stmt->close();
 
+                                    echo "<div class='flex justify-between'>";
                                     if ($opt_row['id'] == $voted_option_id) {
-                                        echo "<strong>" . htmlspecialchars($opt_row['option_text']) . " (Your vote)</strong><br>";
-                                    } else {
-                                        echo htmlspecialchars($opt_row['option_text']) . "<br>";
+                                        echo "<strong class='text-[#FF007F]'>" . htmlspecialchars($opt_row['option_text']) . " (Your vote)</strong>";
+                                    } 
+                                    else {
+                                        echo htmlspecialchars($opt_row['option_text']);
                                     }
 
                                     $disp_votes = "SELECT COUNT(*) as votes FROM votes WHERE poll_id = ? AND option_id = ?";
@@ -143,21 +146,23 @@ include "db.php";
                                     $vote_result = $vote_stmt->get_result();
                                     if ($vote_result) {
                                         $vote_row = $vote_result->fetch_assoc();
-                                        echo "Votes: " . $vote_row['votes'] . "<br>";
+                                        echo "<span>Votes: " . $vote_row['votes'] . "</span>";
                                     }
                                     $vote_stmt->close();
+                                    echo "</div><br>";
                                 }
                             }
                             $opt_stmt->close();
                             echo "</div>";
                         }
-                    } else {
+                        echo "</div>";
+                    } 
+                    else {
                         echo "<p>No results available</p>";
                     }
                     $stmt->close();
                     ?>
                 </div>
-            </div>
             </div>
         <?php endif; ?>
     </div>

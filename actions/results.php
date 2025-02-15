@@ -21,7 +21,7 @@ include "../db.php";
 </head>
 <body class="relative text-white">
     <div class="container mx-auto p-4 absolute text-white">
-        <h1 class="text-3xl font-bold mb-6 text-center">Results</h1>
+        <h1 class="text-6xl font-bold mb-6 text-center text-[#FF007F] mt-6">Results</h1>
         <?php
         $user_id = $_SESSION['id'];
         $disp_poll = "SELECT polls.*, users.username FROM polls JOIN users ON polls.created_by = users.id";

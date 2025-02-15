@@ -50,26 +50,26 @@ if (isset($_SESSION['username'])) {
         }
     </style>
 </head>
-<body class="relative text-white">
-    <div class="container mx-auto p-4 fixed text-white">
-        <h1 class="text-6xl font-bold mb-6 text-center mt-6">Dashboard</h1>
+<body class="relative">
+    <div class="container mx-auto p-4 absolute text-white">
+        <h1 class="text-6xl font-bold mb-6 text-center text-[#FF007F] mt-6">Dashboard</h1>
         <button onclick="toggleForm()" class="bg-[#FF007F] hover:bg-[#8A2BEE] text-white font-bold py-2 px-4 rounded mb-4">Create Poll</button>
-        <div id="createPollForm" style="display: none;" class="bg-[#032F30] p-4 rounded-lg mb-4 shadow-lg max-w-md mx-auto">
+        <div id="createPollForm" style="display: none;" class="bg-black/40 p-4 rounded-lg mb-4 shadow-lg max-w-md mx-auto">
             <form action="addpoll.php" method="POST">
                 <div class="mb-4">
                     <label for="topic" class="block text-sm font-medium">Topic</label>
-                    <input type="text" name="topic" id="topic" class="w-full p-2 mt-1 rounded bg-[#031716] text-white" required>
+                    <input type="text" name="topic" id="topic" class="w-full p-2 mt-1 rounded bg-[#8A2BE2] text-white" required>
                 </div>
                 <div id="options" class="mb-4">
                     <div>
-                        <input type="text" name="options[]" placeholder="Option 1" class="w-full p-2 mt-1 rounded bg-[#031716] text-white" required>
+                        <input type="text" name="options[]" placeholder="Option 1" class="w-full p-2 mt-1 rounded bg-[#8A2BE2] text-white" required>
                     </div>
                     <div>
-                        <input type="text" name="options[]" placeholder="Option 2" class="w-full p-2 mt-1 rounded bg-[#031716] text-white" required>
+                        <input type="text" name="options[]" placeholder="Option 2" class="w-full p-2 mt-1 rounded bg-[#8A2BE2] text-white" required>
                     </div>
                 </div>
-                <button type="button" onclick="addOption()" class="w-full bg-[#0A7075] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded mb-4">Add Option</button>
-                <button type="submit" name="create_poll" class="w-full bg-[#0A7075] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded">Create Poll</button>
+                <button type="button" onclick="addOption()" class="w-full bg-[#FF007F] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded mb-4">Add Option</button>
+                <button type="submit" name="create_poll" class="w-full bg-[#FF007F] hover:bg-[#0C969C] text-white font-bold py-2 px-4 rounded">Create Poll</button>
             </form>
         </div>
         <?php

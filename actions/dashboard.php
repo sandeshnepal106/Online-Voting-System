@@ -39,6 +39,17 @@ if (isset($_SESSION['username'])) {
                 form.style.display = 'none';
             }
         }
+        
+        function addTags(){
+            var tags = document.getElementById('tags');
+            if (tags.style.display === 'none' || tags.style.display === '') {
+                tags.style.display = 'block';
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+            else {
+                tags.style.display = 'none';
+            }
+        }
     </script>
     <style>
         .scrollbar-hide::-webkit-scrollbar {
@@ -56,6 +67,22 @@ if (isset($_SESSION['username'])) {
         <button onclick="toggleForm()" class="bg-[#FF007F] hover:bg-[#8A2BEE] text-white font-bold py-2 px-4 rounded mb-4">Create Poll</button>
         <div id="createPollForm" style="display: none;" class="bg-black/40 p-4 rounded-lg mb-4 shadow-lg max-w-md mx-auto">
             <form action="addpoll.php" method="POST">
+                <button onclick="addTags()" class="bg-[#FA1232] p-2 rounded-lg">Add tags</button>
+                <div id="tags" style="display: none;">
+                    <?php
+                    $disp_tags = "SELECT * FROM niches";
+                    $stmt = $conn->prepare($disp_tags);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    if ($result) {
+                        while ($tag_row = $result->fetch_assoc()) {
+                            echo"<input type='checkbox' name='tags[]' value='" . $tag_row['id'] . "'>";
+                            echo"<label for tags[]>" . htmlspecialchars($tag_row['niche']) . "</label><br>";
+                        }
+                    }
+                    $stmt->close();
+                    ?>
+                </div>
                 <div class="mb-4">
                     <label for="topic" class="block text-sm font-medium">Topic</label>
                     <input type="text" name="topic" id="topic" class="w-full p-2 mt-1 rounded bg-[#8A2BE2] text-white" required>

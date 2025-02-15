@@ -9,6 +9,7 @@ if (!isset($_SESSION['username'])) {
 
 if (isset($_POST['create_poll'])) {
     $topic = $_POST['topic'];
+    $tags = $_POST['tags'];
     $options = $_POST['options'];
     $username = $_SESSION['username'];
     $fetch_id = "SELECT id FROM users WHERE username = ?";
@@ -24,6 +25,15 @@ if (isset($_POST['create_poll'])) {
         $stmt->bind_param("si", $topic, $user_id);
         if ($stmt->execute()) {
             $poll_id = $stmt->insert_id;
+            if (!empty($tags)) {
+                $insertTags = "INSERT INTO tags (poll_id, niche_id) VALUES (?, ?)";
+                $tagsStmt = $conn->prepare($insertTags);
+                foreach ($tags as $niche) {
+                    $tagsStmt->bind_param("ii", $poll_id, $niche);
+                    $tagsStmt->execute();
+                }
+                $tagsStmt->close();
+            }
             $options_sql = "INSERT INTO poll_options (poll_id, option_text) VALUES (?, ?)";
             $stmt = $conn->prepare($options_sql);
             foreach ($options as $index => $option) {

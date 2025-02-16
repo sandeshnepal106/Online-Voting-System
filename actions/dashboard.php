@@ -100,13 +100,16 @@ if (isset($_SESSION['username'])) {
             </form>
         </div>
         <?php
-        $disp_poll = "SELECT polls.*, users.username 
+        $disp_poll = "SELECT DISTINCT polls.*, users.username 
                       FROM polls 
-                      JOIN users ON polls.created_by = users.id 
+                      JOIN users ON polls.created_by = users.id
+                      JOIN tags ON polls.id = tags.poll_id
+                      JOIN interests ON tags.niche_id = interests.niche_id
                       WHERE polls.id NOT IN (SELECT poll_id FROM votes WHERE user_id = ?) 
+                      AND interests.user_id = ?
                       ORDER BY polls.created_at ASC";
         $stmt = $conn->prepare($disp_poll);
-        $stmt->bind_param("i", $user_id);
+        $stmt->bind_param("ii", $user_id, $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result) {
@@ -117,6 +120,24 @@ if (isset($_SESSION['username'])) {
                 echo "<div class='flex justify-around color-gray text-xs'> <h1><strong>Posted by: </strong>" . htmlspecialchars($row['username']) . "</h1>";
                 echo "<h1><strong>At:</strong> " . htmlspecialchars($row['created_at']) . "</h1> </div> <br>";
                 $poll_id = $row['id'];
+
+                $disp_tag = "SELECT niches.niche 
+                             FROM tags 
+                             JOIN niches ON tags.niche_id = niches.id 
+                             WHERE tags.poll_id = ?";
+                $tag_stmt = $conn->prepare($disp_tag);
+                $tag_stmt->bind_param("i", $poll_id);
+                $tag_stmt->execute();
+                $tag_result = $tag_stmt->get_result();
+                if($tag_result) {
+                    echo "<div class='flex justify-around color-gray text-xs'>";
+                    echo "<h1><strong>Tags:</strong></h1>";
+                    while ($tag_row = $tag_result->fetch_assoc()) {
+                        echo "<h1>" . htmlspecialchars($tag_row['niche']) . "</h1>";
+                    }
+                    echo "</div>";
+                }
+
                 $disp_options = "SELECT * FROM poll_options WHERE poll_id = ?";
                 $opt_stmt = $conn->prepare($disp_options);
                 $opt_stmt->bind_param("i", $poll_id);

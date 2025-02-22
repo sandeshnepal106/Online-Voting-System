@@ -24,8 +24,15 @@ include "../db.php";
         <h1 class="text-6xl font-bold mb-6 text-center text-[#FF007F] mt-6">Results</h1>
         <?php
         $user_id = $_SESSION['id'];
-        $disp_poll = "SELECT polls.*, users.username FROM polls JOIN users ON polls.created_by = users.id";
+        $disp_poll = "SELECT DISTINCT polls.*, users.username 
+                        FROM polls 
+                        JOIN users ON polls.created_by = users.id 
+                        JOIN tags ON polls.id = tags.poll_id
+                        JOIN interests ON tags.niche_id = interests.niche_id
+                        WHERE interests.user_id = ?
+                        ORDER BY polls.created_at ASC";
         $stmt = $conn->prepare($disp_poll);
+        $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result) {
@@ -36,6 +43,23 @@ include "../db.php";
                 echo "<div class='flex justify-around text-xs'> <h1><strong>Posted by: </strong>" . htmlspecialchars($row['username']) . "</h1>";
                 echo "<h1><strong>At:</strong> " . htmlspecialchars($row['created_at']) . "</h1> </div> <br>";
                 $poll_id = $row['id'];
+
+                $disp_tags = "SELECT niches.niche 
+                              FROM tags 
+                              JOIN niches ON tags.niche_id = niches.id 
+                              WHERE tags.poll_id = ?";
+                $tag_stmt = $conn->prepare($disp_tags);
+                $tag_stmt->bind_param("i", $poll_id);
+                $tag_stmt->execute();
+                $tag_result = $tag_stmt->get_result();
+                if ($tag_result) {
+                    echo "<div class='flex flex-wrap gap-2 mb-4'>";
+                    while ($tag_row = $tag_result->fetch_assoc()) {
+                        echo "<span class='bg-[#8A2BE2] text-white px-2 py-1 rounded'>" . htmlspecialchars($tag_row['niche']) . "</span>";
+                    }
+                    echo "</div>";
+                }
+                $tag_stmt->close();
 
                 $disp_options = "SELECT * FROM poll_options WHERE poll_id = ?";
                 $opt_stmt = $conn->prepare($disp_options);

@@ -121,22 +121,22 @@ if (isset($_SESSION['username'])) {
                 echo "<h1><strong>At:</strong> " . htmlspecialchars($row['created_at']) . "</h1> </div> <br>";
                 $poll_id = $row['id'];
 
-                $disp_tag = "SELECT niches.niche 
-                             FROM tags 
-                             JOIN niches ON tags.niche_id = niches.id 
-                             WHERE tags.poll_id = ?";
-                $tag_stmt = $conn->prepare($disp_tag);
+                $disp_tags = "SELECT niches.niche 
+                              FROM tags 
+                              JOIN niches ON tags.niche_id = niches.id 
+                              WHERE tags.poll_id = ?";
+                $tag_stmt = $conn->prepare($disp_tags);
                 $tag_stmt->bind_param("i", $poll_id);
                 $tag_stmt->execute();
                 $tag_result = $tag_stmt->get_result();
-                if($tag_result) {
-                    echo "<div class='flex justify-around color-gray text-xs'>";
-                    echo "<h1><strong>Tags:</strong></h1>";
+                if ($tag_result) {
+                    echo "<div class='flex flex-wrap gap-2 mb-4'>";
                     while ($tag_row = $tag_result->fetch_assoc()) {
-                        echo "<h1>" . htmlspecialchars($tag_row['niche']) . "</h1>";
+                        echo "<span class='bg-[#8A2BE2] text-white px-2 py-1 rounded'>" . htmlspecialchars($tag_row['niche']) . "</span>";
                     }
                     echo "</div>";
                 }
+                $tag_stmt->close();
 
                 $disp_options = "SELECT * FROM poll_options WHERE poll_id = ?";
                 $opt_stmt = $conn->prepare($disp_options);

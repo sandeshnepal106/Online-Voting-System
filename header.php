@@ -27,6 +27,7 @@ session_start();
                 <?php if(!isset($_SESSION['username'])): ?>
                     <li><a href="/WebDev/Online-Voting-System/entry/login.php" class="hover:underline">Login/Register</a></li>
                 <?php else: ?>
+                    <li><a href="/WebDev/Online-Voting-System/actions/profile.php" class="hover:underline">Profile</a></li>
                     <li><a href="/WebDev/Online-Voting-System/entry/logout.php" class="hover:underline">Logout</a></li>
                 <?php endif; ?>
             </ul>
